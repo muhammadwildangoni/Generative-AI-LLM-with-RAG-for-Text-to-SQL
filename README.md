@@ -26,7 +26,7 @@ A powerful, secure, and intuitive natural language interface for your databases.
 - **Framework**: [LangChain](https://www.langchain.com/)
 - **UI**: [Streamlit](https://streamlit.io/)
 - **Vector DB**: [ChromaDB](https://www.trychroma.com/)
-- **Database**: SQLite with [SQLAlchemy](https://www.sqlalchemy.org/)
+- **Database**: Postgree
 - **Embeddings**: Sentence-Transformers (all-MiniLM-L6-v2)
 
 ---
