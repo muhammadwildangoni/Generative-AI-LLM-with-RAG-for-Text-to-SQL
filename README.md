@@ -32,7 +32,7 @@ This project leverages **Google Gemini (LLM)** and **Retrieval-Augmented Generat
 
 ## 🏗️ System Architecture
 
-This system consists of two main phases:
+![Architecture](assets/workflow_rag_text2sql.png)
 
 ### 🔵 Offline Phase
 - Schema extraction from PostgreSQL  
