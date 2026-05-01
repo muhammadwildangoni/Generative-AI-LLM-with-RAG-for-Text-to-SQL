@@ -1,0 +1,11 @@
+PyYAML
+chromadb
+langchain
+langchain-chroma
+langchain-google-genai
+langchain-huggingface
+python-dotenv
+sentence-transformers
+sqlalchemy
+streamlit
+watchdog

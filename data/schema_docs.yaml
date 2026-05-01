@@ -1,0 +1,1005 @@
+database:
+  name: "northwind"
+  description: |
+    Northwind adalah database simulasi perusahaan distribusi yang menjual produk 
+    ke pelanggan melalui sistem pemesanan (orders). Database ini mencakup informasi 
+    pelanggan, produk, supplier, karyawan, pengiriman, dan detail transaksi.
+
+    Database ini digunakan untuk analisis penjualan, performa produk, aktivitas pelanggan,
+    dan operasional bisnis secara keseluruhan.
+
+  tables:
+
+    - name: "customers"
+      description: |
+        Tabel customers menyimpan informasi lengkap mengenai pelanggan yang melakukan
+        pembelian produk. Data ini digunakan sebagai referensi utama dalam analisis
+        transaksi, perilaku pelanggan, dan segmentasi pasar.
+
+      columns:
+
+        - name: "customer_id"
+          type: "TEXT"
+          description: |
+            ID unik untuk setiap pelanggan. Nilai ini bersifat primary key dan digunakan
+            sebagai identifier utama untuk menghubungkan tabel customers dengan tabel lain
+            seperti orders.
+
+        - name: "company_name"
+          type: "TEXT"
+          description: |
+            Nama perusahaan atau organisasi pelanggan. Kolom ini sering digunakan untuk
+            menampilkan identitas pelanggan dalam laporan dan analisis.
+
+        - name: "contact_name"
+          type: "TEXT"
+          description: |
+            Nama individu yang menjadi kontak utama dari perusahaan pelanggan.
+            Biasanya digunakan untuk komunikasi langsung terkait pesanan.
+
+        - name: "contact_title"
+          type: "TEXT"
+          description: |
+            Jabatan atau posisi dari contact person di perusahaan pelanggan,
+            seperti Manager, Owner, atau Sales Representative.
+
+        - name: "address"
+          type: "TEXT"
+          description: |
+            Alamat lengkap pelanggan. Digunakan untuk keperluan pengiriman barang
+            dan dokumentasi lokasi pelanggan.
+
+        - name: "city"
+          type: "TEXT"
+          description: |
+            Kota tempat pelanggan berada. Sering digunakan untuk analisis geografis
+            seperti distribusi pelanggan berdasarkan kota.
+
+        - name: "region"
+          type: "TEXT"
+          description: |
+            Wilayah atau provinsi pelanggan. Nilai ini bisa kosong (NULL) jika tidak tersedia.
+            Digunakan untuk analisis regional yang lebih detail.
+
+        - name: "postal_code"
+          type: "TEXT"
+          description: |
+            Kode pos dari lokasi pelanggan. Berguna untuk keperluan pengiriman dan validasi alamat.
+
+        - name: "country"
+          type: "TEXT"
+          description: |
+            Negara tempat pelanggan berada. Kolom ini sering digunakan untuk analisis
+            distribusi pelanggan berdasarkan negara.
+
+        - name: "phone"
+          type: "TEXT"
+          description: |
+            Nomor telepon utama pelanggan. Digunakan untuk komunikasi terkait pesanan
+            atau layanan pelanggan.
+
+        - name: "fax"
+          type: "TEXT"
+          description: |
+            Nomor fax pelanggan. Tidak selalu tersedia dan bisa bernilai NULL.
+            Biasanya digunakan pada sistem komunikasi lama.
+
+    - name: "orders"
+      description: |
+        Tabel orders menyimpan informasi transaksi pemesanan yang dilakukan oleh pelanggan.
+        Setiap baris merepresentasikan satu order, yang terhubung dengan pelanggan,
+        karyawan, dan detail produk melalui tabel lain seperti order_details.
+
+      columns:
+
+        - name: "order_id"
+          type: "INTEGER"
+          description: |
+            ID unik untuk setiap order. Berfungsi sebagai primary key dan digunakan
+            untuk menghubungkan dengan tabel order_details.
+
+        - name: "customer_id"
+          type: "TEXT"
+          description: |
+            ID pelanggan yang melakukan order. Merupakan foreign key yang mengacu ke
+            tabel customers.customer_id.
+
+        - name: "employee_id"
+          type: "INTEGER"
+          description: |
+            ID karyawan yang menangani order. Digunakan untuk analisis performa karyawan
+            dalam menangani penjualan.
+
+        - name: "order_date"
+          type: "DATE"
+          description: |
+            Tanggal ketika order dibuat oleh pelanggan. Digunakan untuk analisis
+            time-series seperti penjualan harian, bulanan, atau tahunan.
+
+        - name: "required_date"
+          type: "DATE"
+          description: |
+            Tanggal target pengiriman yang diharapkan oleh pelanggan.
+            Digunakan untuk mengukur ketepatan waktu pengiriman.
+
+        - name: "shipped_date"
+          type: "DATE"
+          description: |
+            Tanggal aktual ketika order dikirim. Nilai bisa NULL jika pesanan
+            belum dikirim.
+
+        - name: "ship_via"
+          type: "INTEGER"
+          description: |
+            ID metode pengiriman atau perusahaan pengiriman (shipper).
+            Merupakan foreign key ke tabel shippers.shipper_id.
+
+        - name: "freight"
+          type: "NUMERIC"
+          description: |
+            Biaya pengiriman untuk order ini. Digunakan dalam analisis biaya logistik
+            dan total biaya transaksi.
+
+        - name: "ship_name"
+          type: "TEXT"
+          description: |
+            Nama penerima atau nama tujuan pengiriman. Bisa berbeda dari nama perusahaan
+            customer.
+
+        - name: "ship_address"
+          type: "TEXT"
+          description: |
+            Alamat lengkap tujuan pengiriman barang.
+
+        - name: "ship_city"
+          type: "TEXT"
+          description: |
+            Kota tujuan pengiriman. Digunakan untuk analisis distribusi pengiriman.
+
+        - name: "ship_region"
+          type: "TEXT"
+          description: |
+            Wilayah atau provinsi tujuan pengiriman. Bisa bernilai NULL jika tidak tersedia.
+
+        - name: "ship_postal_code"
+          type: "TEXT"
+          description: |
+            Kode pos tujuan pengiriman.
+
+        - name: "ship_country"
+          type: "TEXT"
+          description: |
+            Negara tujuan pengiriman. Digunakan untuk analisis distribusi pengiriman
+            secara global.
+
+    - name: "order_details"
+      description: |
+        Tabel order_details menyimpan detail item produk untuk setiap order.
+        Setiap baris merepresentasikan satu produk dalam satu order (line item).
+
+        Tabel ini adalah inti dari perhitungan penjualan (sales), karena berisi
+        informasi jumlah produk, harga saat transaksi, dan diskon yang diberikan.
+
+        Untuk menghitung total penjualan, tabel ini HARUS digunakan.
+
+      columns:
+
+        - name: "order_id"
+          type: "INTEGER"
+          description: |
+            ID order yang terkait dengan item ini. Merupakan foreign key ke tabel
+            orders.order_id.
+
+            Digunakan untuk menghubungkan detail produk dengan transaksi utama.
+
+        - name: "product_id"
+          type: "INTEGER"
+          description: |
+            ID produk yang dibeli dalam order. Merupakan foreign key ke tabel
+            products.product_id.
+
+            Digunakan untuk analisis performa produk.
+
+        - name: "unit_price"
+          type: "NUMERIC"
+          description: |
+            Harga produk pada saat transaksi terjadi (historical price).
+
+            Penting:
+            Nilai ini bisa berbeda dengan products.unit_price karena harga bisa berubah
+            seiring waktu. Oleh karena itu, kolom ini HARUS digunakan untuk menghitung
+            total penjualan historis.
+
+        - name: "quantity"
+          type: "INTEGER"
+          description: |
+            Jumlah unit produk yang dibeli dalam order.
+
+            Digunakan dalam perhitungan total penjualan dan analisis volume produk.
+
+        - name: "discount"
+          type: "NUMERIC"
+          description: |
+            Diskon yang diberikan untuk item ini dalam bentuk desimal.
+
+            Contoh:
+            0.1 = diskon 10%
+
+            Dalam perhitungan total penjualan, diskon harus diterapkan sebagai:
+            (1 - discount)
+
+            Contoh perhitungan:
+            total = unit_price * quantity * (1 - discount)
+
+    - name: "products"
+      description: |
+        Tabel products menyimpan informasi mengenai produk yang dijual oleh perusahaan.
+        Data ini mencakup nama produk, kategori, supplier, harga saat ini, serta informasi stok.
+
+        Tabel ini digunakan untuk analisis produk, seperti performa penjualan,
+        kategori produk, dan ketersediaan stok.
+
+        Penting:
+        Harga pada tabel ini adalah harga saat ini (current price), bukan harga saat transaksi.
+        Untuk analisis penjualan historis, gunakan order_details.unit_price.
+
+      columns:
+
+        - name: "product_id"
+          type: "INTEGER"
+          description: |
+            ID unik untuk setiap produk. Berfungsi sebagai primary key dan digunakan
+            untuk menghubungkan ke tabel order_details dan tabel lain.
+
+        - name: "product_name"
+          type: "TEXT"
+          description: |
+            Nama produk. Digunakan dalam laporan dan analisis untuk identifikasi produk.
+
+        - name: "supplier_id"
+          type: "INTEGER"
+          description: |
+            ID supplier yang menyediakan produk ini. Merupakan foreign key ke tabel suppliers.
+
+            Digunakan untuk analisis performa supplier.
+
+        - name: "category_id"
+          type: "INTEGER"
+          description: |
+            ID kategori produk. Merupakan foreign key ke tabel categories.
+
+            Digunakan untuk mengelompokkan produk dalam kategori tertentu.
+
+        - name: "quantity_per_unit"
+          type: "TEXT"
+          description: |
+            Deskripsi jumlah unit dalam satu paket produk.
+
+            Contoh:
+            "10 boxes x 20 bags"
+
+            Tidak digunakan untuk perhitungan numerik, hanya informasi deskriptif.
+
+        - name: "unit_price"
+          type: "NUMERIC"
+          description: |
+            Harga produk saat ini (current price).
+
+            Penting:
+            Kolom ini TIDAK digunakan untuk menghitung penjualan historis,
+            karena harga bisa berubah dari waktu ke waktu.
+
+            Untuk perhitungan penjualan gunakan:
+            order_details.unit_price
+
+        - name: "units_in_stock"
+          type: "INTEGER"
+          description: |
+            Jumlah stok produk yang tersedia saat ini.
+
+            Digunakan untuk analisis inventori dan ketersediaan produk.
+
+        - name: "units_on_order"
+          type: "INTEGER"
+          description: |
+            Jumlah unit produk yang sedang dalam proses pemesanan dari supplier.
+
+            Digunakan untuk perencanaan stok.
+
+        - name: "reorder_level"
+          type: "INTEGER"
+          description: |
+            Batas minimum stok sebelum produk perlu dipesan ulang.
+
+            Digunakan dalam manajemen inventori.
+
+        - name: "discontinued"
+          type: "BOOLEAN"
+          description: |
+            Status apakah produk sudah tidak dijual lagi.
+
+            TRUE = produk sudah dihentikan
+            FALSE = produk masih aktif
+
+    - name: "categories"
+      description: |
+        Tabel categories menyimpan informasi kategori dari setiap produk.
+        Digunakan untuk mengelompokkan produk ke dalam jenis tertentu seperti
+        makanan, minuman, atau produk lainnya.
+
+        Tabel ini penting untuk analisis penjualan berdasarkan kategori produk.
+
+      columns:
+
+        - name: "category_id"
+          type: "INTEGER"
+          description: |
+            ID unik untuk setiap kategori. Berfungsi sebagai primary key dan digunakan
+            untuk menghubungkan ke tabel products.
+
+        - name: "category_name"
+          type: "TEXT"
+          description: |
+            Nama kategori produk.
+
+            Contoh:
+            "Beverages", "Seafood", "Condiments"
+
+            Kolom ini sering digunakan dalam GROUP BY untuk analisis penjualan
+            berdasarkan kategori.
+
+        - name: "description"
+          type: "TEXT"
+          description: |
+            Deskripsi kategori produk yang menjelaskan jenis atau karakteristik
+            dari kategori tersebut.
+
+            Bersifat informatif dan jarang digunakan dalam query analisis.
+
+        - name: "picture"
+          type: "BYTEA"
+          description: |
+            Gambar yang merepresentasikan kategori dalam bentuk binary data.
+
+            Kolom ini jarang digunakan dalam analisis atau query SQL karena berisi data gambar.
+
+    - name: "suppliers"
+      description: |
+        Tabel suppliers menyimpan informasi mengenai perusahaan atau pihak yang
+        menyediakan produk. Data ini digunakan untuk melacak asal produk dan
+        melakukan analisis performa supplier.
+
+        Tabel ini berhubungan langsung dengan tabel products melalui supplier_id.
+
+      columns:
+
+        - name: "supplier_id"
+          type: "INTEGER"
+          description: |
+            ID unik untuk setiap supplier. Berfungsi sebagai primary key dan digunakan
+            untuk menghubungkan ke tabel products.
+
+        - name: "company_name"
+          type: "TEXT"
+          description: |
+            Nama perusahaan supplier.
+
+            Digunakan untuk identifikasi supplier dalam laporan dan analisis.
+
+        - name: "contact_name"
+          type: "TEXT"
+          description: |
+            Nama individu yang menjadi kontak utama dari supplier.
+
+            Digunakan untuk komunikasi terkait pengadaan produk.
+
+        - name: "contact_title"
+          type: "TEXT"
+          description: |
+            Jabatan atau posisi dari contact person di perusahaan supplier.
+
+            Contoh:
+            "Sales Manager", "Owner"
+
+        - name: "address"
+          type: "TEXT"
+          description: |
+            Alamat lengkap supplier.
+
+            Digunakan untuk keperluan pengiriman atau administrasi.
+
+        - name: "city"
+          type: "TEXT"
+          description: |
+            Kota lokasi supplier.
+
+            Digunakan untuk analisis geografis supplier.
+
+        - name: "region"
+          type: "TEXT"
+          description: |
+            Wilayah atau provinsi supplier.
+
+            Nilai bisa NULL jika tidak tersedia.
+
+        - name: "postal_code"
+          type: "TEXT"
+          description: |
+            Kode pos lokasi supplier.
+
+        - name: "country"
+          type: "TEXT"
+          description: |
+            Negara asal supplier.
+
+            Digunakan untuk analisis distribusi supplier secara global.
+
+        - name: "phone"
+          type: "TEXT"
+          description: |
+            Nomor telepon utama supplier.
+
+            Digunakan untuk komunikasi.
+
+        - name: "fax"
+          type: "TEXT"
+          description: |
+            Nomor fax supplier.
+
+            Bisa bernilai NULL dan jarang digunakan dalam sistem modern.
+
+        - name: "homepage"
+          type: "TEXT"
+          description: |
+            Halaman website supplier (URL).
+
+            Biasanya berisi informasi tambahan tentang supplier.
+
+    - name: "employees"
+      description: |
+        Tabel employees menyimpan informasi tentang karyawan yang bekerja di perusahaan.
+        Karyawan ini berperan dalam menangani order pelanggan.
+
+        Tabel ini juga memiliki struktur hierarki, di mana seorang karyawan dapat memiliki
+        atasan yang juga merupakan karyawan lain dalam tabel yang sama.
+
+        Digunakan untuk analisis performa karyawan dan struktur organisasi.
+
+      columns:
+
+        - name: "employee_id"
+          type: "INTEGER"
+          description: |
+            ID unik untuk setiap karyawan. Berfungsi sebagai primary key.
+
+        - name: "last_name"
+          type: "TEXT"
+          description: |
+            Nama belakang karyawan.
+
+        - name: "first_name"
+          type: "TEXT"
+          description: |
+            Nama depan karyawan.
+
+        - name: "title"
+          type: "TEXT"
+          description: |
+            Jabatan atau posisi pekerjaan karyawan dalam perusahaan.
+
+            Contoh:
+            "Sales Representative", "Manager"
+
+        - name: "title_of_courtesy"
+          type: "TEXT"
+          description: |
+            Gelar kehormatan karyawan.
+
+            Contoh:
+            "Mr.", "Ms.", "Dr."
+
+        - name: "birth_date"
+          type: "DATE"
+          description: |
+            Tanggal lahir karyawan.
+
+            Digunakan untuk analisis usia atau demografi karyawan.
+
+        - name: "hire_date"
+          type: "DATE"
+          description: |
+            Tanggal karyawan mulai bekerja di perusahaan.
+
+            Digunakan untuk analisis masa kerja.
+
+        - name: "address"
+          type: "TEXT"
+          description: |
+            Alamat tempat tinggal karyawan.
+
+        - name: "city"
+          type: "TEXT"
+          description: |
+            Kota tempat tinggal karyawan.
+
+        - name: "region"
+          type: "TEXT"
+          description: |
+            Wilayah atau provinsi tempat tinggal karyawan.
+
+            Bisa bernilai NULL.
+
+        - name: "postal_code"
+          type: "TEXT"
+          description: |
+            Kode pos alamat karyawan.
+
+        - name: "country"
+          type: "TEXT"
+          description: |
+            Negara tempat tinggal karyawan.
+
+        - name: "home_phone"
+          type: "TEXT"
+          description: |
+            Nomor telepon rumah karyawan.
+
+        - name: "extension"
+          type: "TEXT"
+          description: |
+            Nomor ekstensi internal karyawan di kantor.
+
+        - name: "photo"
+          type: "BYTEA"
+          description: |
+            Data foto karyawan dalam bentuk binary.
+
+            Tidak digunakan dalam query analisis.
+
+        - name: "notes"
+          type: "TEXT"
+          description: |
+            Catatan tambahan mengenai karyawan.
+
+            Bisa berisi informasi detail seperti pengalaman atau keterangan lain.
+
+        - name: "reports_to"
+          type: "INTEGER"
+          description: |
+            ID atasan langsung dari karyawan.
+
+            Merupakan self-referencing foreign key ke employees.employee_id.
+
+            Digunakan untuk membangun struktur organisasi (hierarki).
+
+        - name: "photo_path"
+          type: "TEXT"
+          description: |
+            Path atau lokasi file foto karyawan.
+
+            Biasanya digunakan untuk aplikasi, bukan untuk analisis SQL.
+
+    - name: "shippers"
+      description: |
+        Tabel shippers menyimpan informasi tentang perusahaan jasa pengiriman
+        yang digunakan untuk mengirim pesanan kepada pelanggan.
+
+        Tabel ini digunakan untuk analisis performa pengiriman dan distribusi order.
+
+      columns:
+
+        - name: "shipper_id"
+          type: "INTEGER"
+          description: |
+            ID unik untuk setiap perusahaan pengiriman.
+
+            Berfungsi sebagai primary key dan digunakan untuk menghubungkan
+            ke tabel orders melalui kolom ship_via.
+
+        - name: "company_name"
+          type: "TEXT"
+          description: |
+            Nama perusahaan pengiriman.
+
+            Digunakan untuk identifikasi dalam laporan dan analisis.
+
+            Contoh:
+            "Speedy Express", "United Package"
+
+        - name: "phone"
+          type: "TEXT"
+          description: |
+            Nomor telepon perusahaan pengiriman.
+
+            Digunakan untuk komunikasi terkait pengiriman.
+
+    - name: "employee_territories"
+      description: |
+        Tabel employee_territories adalah tabel penghubung (bridge table) yang
+        merepresentasikan hubungan many-to-many antara karyawan (employees)
+        dan wilayah penjualan (territories).
+
+        Artinya:
+        - Satu karyawan bisa menangani banyak wilayah
+        - Satu wilayah bisa ditangani oleh banyak karyawan
+
+        Tabel ini digunakan untuk analisis distribusi tenaga kerja berdasarkan wilayah.
+
+      columns:
+
+        - name: "employee_id"
+          type: "INTEGER"
+          description: |
+            ID karyawan yang ditugaskan pada suatu wilayah.
+
+            Merupakan foreign key ke tabel employees.employee_id.
+
+            Digunakan untuk menghubungkan data karyawan dengan wilayah kerja mereka.
+
+        - name: "territory_id"
+          type: "TEXT"
+          description: |
+            ID wilayah yang menjadi area kerja karyawan.
+
+            Merupakan foreign key ke tabel territories.territory_id.
+
+            Digunakan untuk mengidentifikasi wilayah penjualan yang ditangani.
+
+    - name: "territories"
+      description: |
+        Tabel territories menyimpan informasi mengenai wilayah penjualan (sales territory)
+        yang digunakan dalam operasi bisnis.
+
+        Wilayah ini digunakan untuk membagi area kerja karyawan dan analisis distribusi
+        penjualan berdasarkan lokasi geografis.
+
+        Tabel ini terhubung dengan employees melalui tabel employee_territories
+        dan dengan region melalui region_id.
+
+      columns:
+
+        - name: "territory_id"
+          type: "TEXT"
+          description: |
+            ID unik untuk setiap wilayah penjualan.
+
+            Berfungsi sebagai primary key dan digunakan untuk menghubungkan
+            ke tabel employee_territories.
+
+        - name: "territory_description"
+          type: "TEXT"
+          description: |
+            Nama atau deskripsi wilayah penjualan.
+
+            Contoh:
+            "Westboro", "Boston"
+
+            Digunakan untuk menampilkan nama wilayah dalam laporan dan analisis.
+
+        - name: "region_id"
+          type: "INTEGER"
+          description: |
+            ID region yang menaungi wilayah ini.
+
+            Merupakan foreign key ke tabel region.region_id.
+
+            Digunakan untuk mengelompokkan wilayah ke dalam region yang lebih besar.
+
+    - name: "region"
+      description: |
+        Tabel region menyimpan informasi mengenai wilayah geografis tingkat tinggi
+        yang digunakan untuk mengelompokkan territories.
+
+        Region merupakan level hierarki di atas territories dalam struktur wilayah.
+
+        Digunakan untuk analisis distribusi bisnis berdasarkan area geografis yang lebih luas.
+
+      columns:
+
+        - name: "region_id"
+          type: "INTEGER"
+          description: |
+            ID unik untuk setiap region.
+
+            Berfungsi sebagai primary key dan digunakan untuk menghubungkan
+            ke tabel territories.
+
+        - name: "region_description"
+          type: "TEXT"
+          description: |
+            Nama atau deskripsi region.
+
+            Contoh:
+            "Eastern", "Western", "Northern", "Southern"
+
+            Digunakan untuk menampilkan nama region dalam laporan dan analisis.
+
+    - name: "customer_customer_demo"
+      description: |
+        Tabel customer_customer_demo adalah tabel penghubung (bridge table)
+        yang merepresentasikan hubungan many-to-many antara pelanggan (customers)
+        dan tipe pelanggan (customer_demographics).
+
+        Artinya:
+        - Satu customer bisa memiliki lebih dari satu tipe/segmentasi
+        - Satu tipe customer bisa dimiliki oleh banyak customer
+
+        Tabel ini digunakan untuk analisis segmentasi pelanggan.
+
+      columns:
+
+        - name: "customer_id"
+          type: "TEXT"
+          description: |
+            ID pelanggan yang termasuk dalam suatu segmentasi.
+
+            Merupakan foreign key ke tabel customers.customer_id.
+
+            Digunakan untuk menghubungkan data pelanggan dengan tipe segmentasinya.
+
+        - name: "customer_type_id"
+          type: "TEXT"
+          description: |
+            ID tipe pelanggan (segmentasi).
+
+            Merupakan foreign key ke tabel customer_demographics.customer_type_id.
+
+            Digunakan untuk mengklasifikasikan pelanggan ke dalam kategori tertentu.
+
+    - name: "customer_demographics"
+      description: |
+        Tabel customer_demographics menyimpan informasi mengenai tipe atau
+        segmentasi pelanggan.
+
+        Tabel ini mendefinisikan kategori atau klasifikasi customer,
+        seperti jenis bisnis, karakteristik pelanggan, atau segmentasi lainnya.
+
+        Digunakan bersama tabel customer_customer_demo untuk menghubungkan
+        pelanggan dengan segmentasi mereka.
+
+      columns:
+
+        - name: "customer_type_id"
+          type: "TEXT"
+          description: |
+            ID unik untuk setiap tipe customer.
+
+            Berfungsi sebagai primary key dan digunakan untuk menghubungkan
+            ke tabel customer_customer_demo.
+
+        - name: "customer_desc"
+          type: "TEXT"
+          description: |
+            Deskripsi dari tipe atau segmentasi customer.
+
+            Kolom ini menjelaskan karakteristik dari kategori customer.
+
+            Contoh:
+            "Retail Customer", "Wholesale Customer", "VIP Customer"
+
+            Digunakan untuk analisis segmentasi dan profiling pelanggan.
+
+    - name: "us_states"
+      description: |
+        Tabel us_states menyimpan informasi mengenai negara bagian di Amerika Serikat.
+
+        Tabel ini bersifat tambahan (supporting table) dan biasanya digunakan untuk
+        referensi geografis, bukan untuk analisis utama dalam sistem penjualan.
+
+        Tidak memiliki relasi langsung dengan tabel utama seperti orders atau customers.
+
+      columns:
+
+        - name: "state_id"
+          type: "INTEGER"
+          description: |
+            ID unik untuk setiap negara bagian.
+
+            Berfungsi sebagai primary key.
+
+        - name: "state_name"
+          type: "TEXT"
+          description: |
+            Nama lengkap negara bagian di Amerika Serikat.
+
+            Contoh:
+            "California", "New York"
+
+        - name: "state_abbr"
+          type: "TEXT"
+          description: |
+            Singkatan resmi negara bagian.
+
+            Contoh:
+            "CA" untuk California, "NY" untuk New York
+
+        - name: "state_region"
+          type: "TEXT"
+          description: |
+            Wilayah geografis negara bagian dalam skala yang lebih besar.
+
+            Contoh:
+            "West", "East", "Midwest"
+
+            Digunakan untuk grouping wilayah dalam analisis geografis tingkat tinggi.
+
+      relationships:
+
+        - description: |
+            Customer melakukan order
+          join: "customers.customer_id = orders.customer_id"
+
+        - description: |
+            Order ditangani oleh karyawan
+          join: "orders.employee_id = employees.employee_id"
+
+        - description: |
+            Order dikirim oleh shipper
+          join: "orders.ship_via = shippers.shipper_id"
+
+        - description: |
+            Order memiliki banyak item produk
+          join: "orders.order_id = order_details.order_id"
+
+        - description: |
+            Detail order mengacu ke produk
+          join: "order_details.product_id = products.product_id"
+
+        - description: |
+            Produk memiliki kategori
+          join: "products.category_id = categories.category_id"
+
+        - description: |
+            Produk berasal dari supplier
+          join: "products.supplier_id = suppliers.supplier_id"
+
+        - description: |
+            Karyawan memiliki wilayah kerja (many-to-many)
+          join: "employees.employee_id = employee_territories.employee_id"
+
+        - description: |
+            Wilayah terhubung ke employee_territories
+          join: "territories.territory_id = employee_territories.territory_id"
+
+        - description: |
+            Wilayah termasuk dalam region
+          join: "territories.region_id = region.region_id"
+
+        - description: |
+            Customer memiliki segmentasi
+          join: "customers.customer_id = customer_customer_demo.customer_id"
+
+        - description: |
+            Segmentasi customer
+          join: "customer_customer_demo.customer_type_id = customer_demographics.customer_type_id"
+
+      business_logic:
+
+        - name: "total_sales"
+          description: |
+            Total penjualan dihitung dari quantity dikali harga dikurangi diskon.
+            Gunakan order_details.unit_price (bukan products.unit_price).
+          formula: "SUM(order_details.quantity * order_details.unit_price * (1 - order_details.discount))"
+
+        - name: "total_orders"
+          description: |
+            Jumlah total order unik.
+          formula: "COUNT(DISTINCT orders.order_id)"
+
+        - name: "total_quantity"
+          description: |
+            Total jumlah produk yang terjual.
+          formula: "SUM(order_details.quantity)"
+
+        - name: "customer_lifetime_value"
+          description: |
+            Total pembelian yang dilakukan oleh customer sepanjang waktu.
+          formula: "SUM(order_details.quantity * order_details.unit_price * (1 - order_details.discount))"
+
+
+      queries:
+
+        - name: "top_customers"
+          description: |
+            Menampilkan customer dengan total pembelian terbesar.
+          sql: |
+            SELECT c.company_name,
+                  SUM(od.quantity * od.unit_price * (1 - od.discount)) AS total_spending
+            FROM customers c
+            JOIN orders o ON c.customer_id = o.customer_id
+            JOIN order_details od ON o.order_id = od.order_id
+            GROUP BY c.company_name
+            ORDER BY total_spending DESC
+            LIMIT 10;
+
+        - name: "sales_by_category"
+          description: |
+            Total penjualan per kategori produk.
+          sql: |
+            SELECT cat.category_name,
+                  SUM(od.quantity * od.unit_price * (1 - od.discount)) AS total_sales
+            FROM categories cat
+            JOIN products p ON cat.category_id = p.category_id
+            JOIN order_details od ON p.product_id = od.product_id
+            GROUP BY cat.category_name;
+
+        - name: "monthly_sales"
+          description: |
+            Total penjualan per bulan.
+          sql: |
+            SELECT DATE_TRUNC('month', o.order_date) AS month,
+                  SUM(od.quantity * od.unit_price * (1 - od.discount)) AS total_sales
+            FROM orders o
+            JOIN order_details od ON o.order_id = od.order_id
+            GROUP BY month
+            ORDER BY month;
+
+      important_rules_for_llm:
+        - "Untuk menghitung revenue, gunakan order_details.unit_price, bukan products.unit_price"
+        - "Selalu perhitungkan discount dengan rumus (1 - discount)"
+        - "Join utama untuk analisis penjualan: customers → orders → order_details"
+        - "Untuk top N per group, gunakan ROW_NUMBER() dan filter dengan WHERE rn <= N"
+        - "Jangan gunakan LIMIT untuk top per group"
+        - "Gunakan DATE_TRUNC untuk agregasi waktu (bulan/tahun)"
+        - "Selalu GROUP BY kolom ID dan nama untuk menghindari ambiguitas"
+
+      common_mistakes:
+        - "Menggunakan products.unit_price untuk menghitung revenue (SALAH)"
+        - "Tidak memperhitungkan discount dalam total penjualan"
+        - "Menggunakan LIMIT untuk top N per group (SALAH)"
+        - "Tidak melakukan join ke order_details saat menghitung sales"
+        - "Grouping hanya berdasarkan nama tanpa ID"
+
+      metrics:
+
+        - name: "revenue"
+          formula: "quantity * unit_price * (1 - discount)"
+          source_table: "order_details"
+          description: |
+            Total pendapatan dari penjualan
+
+        - name: "total_orders"
+          formula: "COUNT(DISTINCT orders.order_id)"
+          description: | 
+            Jumlah order unik
+
+        - name: "total_quantity"
+          formula: "SUM(order_details.quantity)"
+          description: | 
+            Jumlah produk terjual
+
+      synonyms:
+        revenue: ["sales", "pendapatan", "omzet"]
+        customer: ["client", "pelanggan"]
+        product: ["barang", "item"]
+
+      intents:
+        - name: "top_n"
+          keywords: ["top", "terbesar", "paling banyak"]
+        - name: "trend"
+          keywords: ["trend", "per bulan", "per tahun"]
+
+
+metadata:
+  created_at: "2026-04-17"
+  last_updated_at: "2026-04-17"
+  version: "2.0"
+  author: "Muhammad Wildan Goni"
+  description: |
+    Schema ini dirancang untuk mendukung sistem Text-to-SQL berbasis 
+    Retrieval-Augmented Generation (RAG) menggunakan database Northwind.
+
+    Schema ini menyediakan dokumentasi lengkap mengenai tabel, kolom,
+    relasi antar tabel, serta business logic yang diperlukan agar 
+    Large Language Model (LLM) dapat menghasilkan query SQL secara akurat 
+    berdasarkan pertanyaan dalam bahasa alami.
+
+    Fokus utama dari schema ini adalah:
+    - Kejelasan relasi antar tabel untuk memastikan JOIN yang benar
+    - Deskripsi kolom yang detail untuk meningkatkan pemahaman konteks data
+    - Definisi business logic yang eksplisit untuk perhitungan agregasi (seperti total penjualan)
+    - Contoh query untuk membimbing pola pembuatan SQL oleh AI
+
+    Dengan struktur ini, sistem dapat meminimalkan kesalahan (hallucination),
+    meningkatkan akurasi query, dan berfungsi sebagai asisten analisis data
+    yang cerdas untuk kebutuhan bisnis dan pelaporan.
