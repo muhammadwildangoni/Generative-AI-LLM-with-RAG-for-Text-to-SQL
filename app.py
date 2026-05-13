@@ -17,6 +17,18 @@ chain = load_chain()
 # UI HEADER
 st.title("🧠 AI Data Analyst (Text-to-SQL)")
 st.markdown("Tanyakan apa saja tentang data Anda, dan dapatkan query SQL serta insight secara otomatis.")
+st.markdown("### Contoh pertanyaan:")
+
+examples = [
+    "Siapa 10 customer dengan pembelian terbesar?",
+    "Berapa total penjualan setiap bulan?",
+    "Produk apa yang paling laris?",
+    "Tampilkan 3 produk dengan penjualan tertinggi di setiap kategori",
+    "Order mana saja yang belum dikirim?"
+]
+
+for ex in examples:
+    st.markdown(f"- {ex}")
 
 
 # SIDEBAR (POSTGRES)
