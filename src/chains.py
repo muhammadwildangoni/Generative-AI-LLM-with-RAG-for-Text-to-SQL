@@ -272,8 +272,6 @@ Instruksi:
 - Jika tidak ada hasil, tulis: "Tidak ditemukan data"
 - Gunakan istilah bisnis dalam Bahasa Indonesia seperti:
   "penjualan", "pelanggan", "produk", "pendapatan"
-- Jika terdapat ERROR_SQL_EXECUTION, tampilkan error asli tanpa mengarang penjelasan lain
-- Jangan menyebut localhost kecuali memang ada di hasil error
 Jawaban:
 """
 
@@ -316,38 +314,61 @@ def get_sql_rag_chain():
     # =========================
     # EXECUTE + FORMAT
     # =========================
-def execute_and_format(inputs):
-    question = inputs["question"]
-    query = inputs["generated_query"]
+    def execute_and_format(inputs):
+        question = inputs["question"]
+        query = inputs["generated_query"]
 
-    try:
-        results = execute_sql(query)
+        try:
+            results = execute_sql(query)
 
-        print("QUERY SUCCESS")
-        print(results)
+            if not results:
+                query_result = "NO_RESULTS"
+                raw_data = []
+            else:
+                query_result = "\n".join(
+                    ", ".join(f"{k}: {v}" for k, v in row.items())
+                    for row in results
+                )
+                raw_data = results
 
-        if not results:
-            query_result = "NO_RESULTS"
-            raw_data = []
-        else:
-            query_result = "\n".join(
-                ", ".join(f"{k}: {v}" for k, v in row.items())
-                for row in results
-            )
-            raw_data = results
+        except Exception as e:
+            error_msg = str(e)
 
-    except Exception as e:
-        print("SQL EXECUTION ERROR:", str(e))
+            fix_prompt = f"""
+            The following SQL has an error:
 
-        query_result = f"ERROR_SQL_EXECUTION: {str(e)}"
-        raw_data = []
+            {query}
 
-    return {
-        "question": question,
-        "generated_query": query,
-        "query_result": query_result,
-        "raw_data": raw_data,
-    }
+            Error:
+            {error_msg}
+
+            Fix the SQL query. Return ONLY corrected SQL.
+            """
+
+            try:
+                fixed_query = get_llm().invoke(fix_prompt).content
+                fixed_query = clean_sql(fixed_query)
+
+                results = execute_sql(fixed_query)
+
+                query_result = "\n".join(
+                    ", ".join(f"{k}: {v}" for k, v in row.items())
+                    for row in results
+                )
+
+                raw_data = results
+                query = fixed_query  # replace with fixed query
+
+            except Exception as e2:
+                query_result = f"ERROR: {str(e2)}"
+                raw_data = []
+
+        return {
+            "question": question,
+            "generated_query": query,
+            "query_result": query_result,
+            "raw_data": raw_data,
+        }
 
     # =========================
     # FINAL CHAIN
