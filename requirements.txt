@@ -9,3 +9,4 @@ sentence-transformers
 sqlalchemy
 streamlit
 watchdog
+psycopg2-binary
